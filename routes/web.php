@@ -19,7 +19,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home.index');//This nam
 Route::get('/about', [HomeController::class, 'about'])->name('home.about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
 
-// /guitars/the class in guitarcontroller . The resource keyword names our routes for us.
+// /guitars/the class in guitarcontroller . The 'resource' keyword names our routes for us.
 Route::resource('guitars', GuitarsController::class);
 // Route::get('/store', function () {
 //     $category = request('category');

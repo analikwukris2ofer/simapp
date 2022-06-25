@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Guitar;
+
 
 class GuitarsController extends Controller
 {
@@ -22,7 +24,12 @@ class GuitarsController extends Controller
     public function index()
     {
         //GET
-        return view('guitars.index');
+        return view('guitars.index', [
+            // 'guitars' => self::getData(),
+            'guitars' => Guitar::all(), 
+            // This retrieves all the data (records) from the guitar model similar to the array above.
+            // 'userInput' => '<script>alert("hello")</script>'
+        ]);
     }
 
     /**
@@ -33,6 +40,7 @@ class GuitarsController extends Controller
     public function create()
     {
         //GET
+        return view('guitars.create');
     }
 
     /**
@@ -43,7 +51,22 @@ class GuitarsController extends Controller
      */
     public function store(Request $request)
     {
+        //laravel helps us validate our data
+        $request->validate([
+            'guitar-name' => 'required',
+            'brand' => 'required',
+            'year' => ['required', 'integer'],
+        ]);
         //POST
+        $guitar = new Guitar();
+        $guitar->name = strip_tags($request->input('guitar-name'));
+        // This takes data from the input form in create.blade.php and saves it on the database.
+        $guitar->brand = strip_tags($request->input('brand'));
+        $guitar->year_made = strip_tags($request->input('year'));
+        $guitar->save();
+        return redirect()->route('guitars.index');
+        //After saving to the database, the application is re-routed to the guitars.index page.
+ 
     }
 
     /**
@@ -52,9 +75,26 @@ class GuitarsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($guitar)
     {
         //GET
+        // $guitars = self::getData();
+        // $record = Guitar::find($guitar);
+        // $record = Guitar::findorFail($guitar);//with this method the find returns a 404 if record is not found.
+        // The find method searches the records and finds the record with the particular id that was passed in
+        // $index = array_search($guitar, array_column($guitars, 'id'));
+
+        // if ($index === false) {
+        //     abort(404);
+        // }
+        // if ($record === false) {
+        //     abort(404);
+        // }
+
+        return view('guitars.show', [
+            // 'guitar' => $guitars[$index]
+            'guitar' => Guitar::findorFail($guitar)
+        ]);
     }
 
     /**
@@ -63,9 +103,12 @@ class GuitarsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($guitar)
     {
         //GET
+        return view('guitars.edit', [
+            'guitar' => Guitar::findorFail($guitar)
+        ]);
     }
 
     /**

@@ -410,6 +410,7 @@
             <a href="{{ route('guitars.index') }}">Guitars</a>
             <a href="{{ route('home.about') }}">About</a>
             <a href="{{ route('home.contact') }}">Contact</a>
+            <a href="{{ route('guitars.create') }}">Add Product</a>
 
         </nav>
 
