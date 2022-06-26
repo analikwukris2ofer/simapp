@@ -17,6 +17,9 @@
                 </li>
             </ul>
 
+            <a href="{{ route('guitars.edit', ['guitar' => $guitar['id']]) }}"><button class="btn">Edit
+                    {{ $guitar['name'] }}</button></a>
+
         </div>
 
 

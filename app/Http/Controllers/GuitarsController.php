@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Guitar;
+use App\Http\Requests\GuitarFormRequest;
 
 
 class GuitarsController extends Controller
@@ -49,21 +50,38 @@ class GuitarsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    // public function store(Request $request)
+    public function store(GuitarFormRequest $request)
     {
         //laravel helps us validate our data
-        $request->validate([
-            'guitar-name' => 'required',
-            'brand' => 'required',
-            'year' => ['required', 'integer'],
-        ]);
+        // $request->validate([
+        //     'guitar-name' => 'required',
+        //     'brand' => 'required',
+        //     'year' => ['required', 'integer'],
+        // ]);
+        $data = $request->validated();
+        //uses the rules in the GuitarFormRequest to validate the data.
         //POST
-        $guitar = new Guitar();
-        $guitar->name = strip_tags($request->input('guitar-name'));
-        // This takes data from the input form in create.blade.php and saves it on the database.
-        $guitar->brand = strip_tags($request->input('brand'));
-        $guitar->year_made = strip_tags($request->input('year'));
-        $guitar->save();
+        // $guitar = new Guitar();
+        // $guitar->name = strip_tags($request->input('guitar-name'));
+        // // This takes data from the input form in create.blade.php and saves it on the database. It is connected
+        // // via the 'action' on the form
+        // $guitar->brand = strip_tags($request->input('brand'));
+        // $guitar->year_made = strip_tags($request->input('year'));
+        // $guitar->save();
+        // return redirect()->route('guitars.index');
+        //After saving to the database, the application is re-routed to the guitars.index page.
+        // $guitar = new Guitar();
+        // $guitar->name = $data['guitar-name'];
+        // // This takes data from the input form in create.blade.php and saves it on the database. It is connected
+        // // via the 'action' on the form
+        // $guitar->brand = $data['brand'];
+        // $guitar->year_made = $data['year'];
+        // $guitar->save();
+        Guitar::create($data);//This line of code will automatically pull data from input fields into database
+        //fields. It replaces all the lines of code above.
+         //However the data must have keys that are the same name as the columns in the database
+        //for mass assignemt to work
         return redirect()->route('guitars.index');
         //After saving to the database, the application is re-routed to the guitars.index page.
  
@@ -75,7 +93,10 @@ class GuitarsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($guitar)
+    // public function show($guitar)
+    public function show(Guitar $guitar)
+    //if you prefix it with Guitar, laravel will look for the id in the Guitar database automatically
+    //if it cannot find the guitar it will automatically fail and return a 404
     {
         //GET
         // $guitars = self::getData();
@@ -93,7 +114,8 @@ class GuitarsController extends Controller
 
         return view('guitars.show', [
             // 'guitar' => $guitars[$index]
-            'guitar' => Guitar::findorFail($guitar)
+//   'guitar' => Guitar::findorFail($guitar)//if we prefix with Guitar then we no longer need this line of code
+        'guitar' => $guitar
         ]);
     }
 
@@ -103,11 +125,13 @@ class GuitarsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($guitar)
+    public function edit(Guitar $guitar)
+    //laravel with automatically search the Guitar database for the $guitar id and retrieve the record.
     {
         //GET
         return view('guitars.edit', [
-            'guitar' => Guitar::findorFail($guitar)
+            // 'guitar' => Guitar::findorFail($guitar)
+            'guitar' => $guitar
         ]);
     }
 
@@ -118,9 +142,44 @@ class GuitarsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    // public function update(Request $request, Guitar $guitar)
+    public function update(GuitarFormRequest $request, Guitar $guitar)
     {
         //POST, PUT, PATCH
+        // $request->validate([
+        //     'guitar-name' => 'required',
+        //     'brand' => 'required',
+        //     'year' => ['required', 'integer'],
+        // ]);
+        $data = $request->validated(); 
+        
+
+        // $record = Guitar::findorFail($guitar);
+        //searches the database for record with the ID and then retrieves it inorder to edit it
+        // $record->name = strip_tags($request->input('guitar-name'));
+     
+        // $record->brand = strip_tags($request->input('brand'));
+        // $record->year_made = strip_tags($request->input('year'));
+        // $record->save();
+        // return redirect()->route('guitars.show', $guitar);
+        // $guitar->name = strip_tags($request->input('guitar-name'));
+
+        // $guitar->brand = strip_tags($request->input('brand'));
+        // $guitar->year_made = strip_tags($request->input('year'));
+        // $guitar->save();
+        // return redirect()->route('guitars.show', $guitar);
+     
+        // $guitar->name = $data['guitar-name'];
+        // $guitar->brand = $data['brand'];
+        // $guitar->year_made = $data['year'];
+        // $guitar->save();
+        $guitar->update($data);
+        //The replaces all the lines of code above and updates the database from the 
+        //edit.page.php
+        //However the data must have keys that are the same name as the columns in the database
+        //for mass assignemt to work
+        return redirect()->route('guitars.show', $guitar->id);
+        //After saving to the database, the application is re-routed to the guitars.index page.
     }
 
     /**
